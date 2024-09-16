@@ -10,6 +10,7 @@ namespace api.Controllers
 {
     public class CountController : ControllerBase
     {
+        private const int MaxTextLength = 10000; 
 
         [HttpPost("count")]
         [Consumes("text/plain")]
@@ -21,6 +22,11 @@ namespace api.Controllers
             if (string.IsNullOrWhiteSpace(text))
             {
                 return BadRequest("Input text cannot be empty or consist only of whitespace.");
+            }
+
+            if (text.Length > MaxTextLength)
+            {
+                return BadRequest($"Input text cannot exceed {MaxTextLength} characters.");
             }
 
             text = text.ToLower();
