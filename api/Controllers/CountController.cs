@@ -25,11 +25,11 @@ namespace api.Controllers
 
             text = text.ToLower();
 
-            var words = Regex.Split(text, @"\W+");
+            string[] words = Regex.Split(text, @"\W+");
 
-            var wordCount = CountWords(words);
+            Dictionary<string, int> wordCount = CountWords(words);
 
-            var topTenWords = GetTopTenWords(wordCount);
+            Dictionary<string, int> topTenWords = GetTopTenWords(wordCount);
 
             return Ok(topTenWords);
         }
