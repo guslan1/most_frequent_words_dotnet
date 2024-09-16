@@ -1,0 +1,58 @@
+# ASP.NET Core
+bin/
+obj/
+*.log
+*.user
+*.vspscc
+*.vssscc
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated files
+.vs/
+**/wwwroot/lib/
+**/wwwroot/node_modules/
+**/node_modules/
+**/dist/
+bower_components/
+jspm_packages/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# DotNet
+AssemblyInfo.cs
+
+# Azure
+.localhistory/
+.azure/
+
+# Logs
+logs/
+*.log
+
+# Build directories
+bin/
+obj/
+
+# OS generated files
+.DS_Store
+Thumbs.db
