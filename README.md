@@ -25,6 +25,9 @@ Within the `api` folder, run `dotnet run` to start the app.
 ### Developer Mode
 Within the `api` folder, run `dotnet watch run` to start the app in dev mode.
 
+### Running Tests
+Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
+
 ## How to Use the REST-API
 ### Sending a GET request to /api of the application returns an explanation of how to use the API.
 ```json
