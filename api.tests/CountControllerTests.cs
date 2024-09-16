@@ -13,23 +13,28 @@ namespace api.tests
 {
     public class CountControllerTests
     {
-        [Fact]
-        public async Task WordCount_ReturnsCorrectWordCount()
+        private CountController CreateControllerWithMockedContext(string requestBody)
         {
-            // Arrange
             var mockHttpContext = new Mock<HttpContext>();
             var mockRequest = new Mock<HttpRequest>();
-            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes("Banan Äpple Katt Hund Banan Hund Katt Hund"));
+            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes(requestBody));
             mockRequest.Setup(r => r.Body).Returns(mockBody);
             mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
 
-            var controller = new CountController
+            return new CountController
             {
                 ControllerContext = new ControllerContext
                 {
                     HttpContext = mockHttpContext.Object
                 }
             };
+        }
+
+        [Fact]
+        public async Task WordCount_ReturnsCorrectWordCount()
+        {
+            // Arrange
+            var controller = CreateControllerWithMockedContext("Banan Äpple Katt Hund Banan Hund Katt Hund");
 
             // Act
             var result = await controller.WordCount() as OkObjectResult;
@@ -48,19 +53,7 @@ namespace api.tests
         public async Task WordCount_ConvertsUppercaseToLowercase()
         {
             // Arrange
-            var mockHttpContext = new Mock<HttpContext>();
-            var mockRequest = new Mock<HttpRequest>();
-            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes("Hund HUND hund"));
-            mockRequest.Setup(r => r.Body).Returns(mockBody);
-            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
-
-            var controller = new CountController()
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = mockHttpContext.Object
-                }
-            };
+            var controller = CreateControllerWithMockedContext("Hund HUND hund");
 
             // Act
             var result = await controller.WordCount() as OkObjectResult;
@@ -76,20 +69,8 @@ namespace api.tests
         public async Task WordCount_ReturnsMaxTenWords()
         {
             // Arrange
-            var mockHttpContext = new Mock<HttpContext>();
-            var mockRequest = new Mock<HttpRequest>();
             var text = "ord1 ord2 ord3 ord4 ord5 ord6 ord7 ord8 ord9 ord10 ord11 ord12 ord13 ord14 ord15";
-            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            mockRequest.Setup(r => r.Body).Returns(mockBody);
-            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
-
-            var controller = new CountController()
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = mockHttpContext.Object
-                }
-            };
+            var controller = CreateControllerWithMockedContext(text);
 
             // Act
             var result = await controller.WordCount() as OkObjectResult;
@@ -105,20 +86,8 @@ namespace api.tests
         public async Task WordCount_SortsWordsAlphabeticallyWhenFrequenciesAreEqual()
         {
             // Arrange
-            var mockHttpContext = new Mock<HttpContext>();
-            var mockRequest = new Mock<HttpRequest>();
             var text = "banan björn banan björn banan björn banan björn";
-            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            mockRequest.Setup(r => r.Body).Returns(mockBody);
-            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
-
-            var controller = new CountController()
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = mockHttpContext.Object
-                }
-            };
+            var controller = CreateControllerWithMockedContext(text);
 
             // Act
             var result = await controller.WordCount() as OkObjectResult;
@@ -137,8 +106,4 @@ namespace api.tests
             Assert.Equal("björn", sortedKeys[1]);
         }
     }
-
-
-
-
 }
