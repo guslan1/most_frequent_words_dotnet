@@ -124,5 +124,25 @@ namespace api.tests
             Assert.NotNull(resultWhitespace);
             Assert.Equal("Input text cannot be empty or consist only of whitespace.", resultWhitespace.Value);
         }
+
+        [Fact]
+        public async Task WordCount_IgnoresPunctuationAndCountsWordsCorrectly()
+        {
+            // Arrange
+            var text = "banan, äpple! katt? hund. banan; hund: katt hund";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(3, wordCount["hund"]);
+            Assert.Equal(2, wordCount["banan"]);
+            Assert.Equal(2, wordCount["katt"]);
+            Assert.Equal(1, wordCount["äpple"]);
+        }
     }
 }
