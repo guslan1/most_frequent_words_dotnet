@@ -144,5 +144,22 @@ namespace api.tests
             Assert.Equal(2, wordCount["katt"]);
             Assert.Equal(1, wordCount["äpple"]);
         }
+
+        [Fact]
+        public async Task WordCount_ReturnsBadRequest_WhenInputExceedsMaxLength()
+        {
+            // Arrange
+            var longText = new string('a', 10001); // Text that exceeds the max length
+            var controller = CreateControllerWithMockedContext(longText);
+
+            // Act
+            var result = await controller.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Input text cannot exceed 10000 characters.", result.Value);
+        }
+
+
     }
 }
