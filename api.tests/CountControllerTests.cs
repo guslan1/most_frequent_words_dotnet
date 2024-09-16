@@ -101,8 +101,44 @@ namespace api.tests
             Assert.True(wordCount.Count <= 10, "The result should contain at most 10 words.");
         }
 
+        [Fact]
+        public async Task WordCount_SortsWordsAlphabeticallyWhenFrequenciesAreEqual()
+        {
+            // Arrange
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            var text = "banan björn banan björn banan björn banan björn";
+            var mockBody = new MemoryStream(Encoding.UTF8.GetBytes(text));
+            mockRequest.Setup(r => r.Body).Returns(mockBody);
+            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
 
+            var controller = new CountController()
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext.Object
+                }
+            };
 
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
 
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(2, wordCount.Count);
+            Assert.Equal(4, wordCount["banan"]);
+            Assert.Equal(4, wordCount["björn"]);
+
+            // Kontrollera att orden är sorterade alfabetiskt när frekvenserna är lika
+            var sortedKeys = new List<string>(wordCount.Keys);
+            Assert.Equal("banan", sortedKeys[0]);
+            Assert.Equal("björn", sortedKeys[1]);
+        }
     }
+
+
+
+
 }
