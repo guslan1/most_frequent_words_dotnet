@@ -105,5 +105,24 @@ namespace api.tests
             Assert.Equal("banan", sortedKeys[0]);
             Assert.Equal("björn", sortedKeys[1]);
         }
+
+        [Fact]
+        public async Task WordCount_ReturnsBadRequest_ForEmptyOrWhitespaceInput()
+        {
+            // Arrange
+            var controllerEmpty = CreateControllerWithMockedContext("");
+            var controllerWhitespace = CreateControllerWithMockedContext("   ");
+
+            // Act
+            var resultEmpty = await controllerEmpty.WordCount() as BadRequestObjectResult;
+            var resultWhitespace = await controllerWhitespace.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(resultEmpty);
+            Assert.Equal("Input text cannot be empty or consist only of whitespace.", resultEmpty.Value);
+
+            Assert.NotNull(resultWhitespace);
+            Assert.Equal("Input text cannot be empty or consist only of whitespace.", resultWhitespace.Value);
+        }
     }
 }
