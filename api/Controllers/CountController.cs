@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 
 namespace api.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
     public class CountController : ControllerBase
     {
 
@@ -32,11 +30,11 @@ namespace api.Controllers
             {
                 return BadRequest("Input text cannot be empty or consist only of whitespace.");
             }
-            
+
             text = text.ToLower();
 
             // Dela upp texten i ord med hjälp av Regex
-            var words = Regex.Split(text, @"\W+"); 
+            var words = Regex.Split(text, @"\W+");
 
             // Vi använder dictionary för att enkelt och effektivt kunna söka och räkna antalet förekomster av varje ord
             var wordCount = new Dictionary<string, int>();
@@ -52,13 +50,15 @@ namespace api.Controllers
                 }
             }
 
-            // Sortera orden efter deras förekomst
-            var sortedWordCount = wordCount
+            // Sortera orden efter deras förekomst och ta de tio största
+            var topTenWords = wordCount
                 .OrderByDescending(x => x.Value)
+                .ThenBy(x => x.Key)
+                .Take(10)
                 .ToDictionary(x => x.Key, x => x.Value);
 
             // Returnera resultatet
-            return Ok(sortedWordCount);
+            return Ok(topTenWords);
         }
     }
 
