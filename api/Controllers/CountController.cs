@@ -32,6 +32,8 @@ namespace api.Controllers
             {
                 return BadRequest("Input text cannot be empty or consist only of whitespace.");
             }
+            
+            text = text.ToLower();
 
             // Dela upp texten i ord med hjälp av Regex
             var words = Regex.Split(text, @"\W+"); 
