@@ -33,12 +33,12 @@ Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
 ```json
 {
     "self": {
-        "href": "http://localhost:3000/api",
+        "href": "http://localhost:5116/api",
         "method": "GET",
         "desc": "Overview of most frequent words API"
     },
     "count": {
-        "href": "http://localhost:3000/count",
+        "href": "http://localhost:5116/count",
         "method": "POST",
         "desc": "Returns the count of the ten most frequent words in the input string",
         "params": "{input_string}",
