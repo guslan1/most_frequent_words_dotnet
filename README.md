@@ -17,13 +17,13 @@ The assignment is to create a web-API that returns the count of the 10 most freq
 ## Scripts
 
 ### Installing Dependencies
-Within the `most_frequent_words_dotnet` folder, run `dotnet restore` to install dependencies.
+Within the `api` folder, run `dotnet restore` to install dependencies.
 
 ### The Application
-Within the `most_frequent_words_dotnet` folder, run `dotnet run` to start the app.
+Within the `api` folder, run `dotnet run` to start the app.
 
 ### Developer Mode
-Within the `most_frequent_words_dotnet` folder, run `dotnet watch run` to start the app in dev mode.
+Within the `api` folder, run `dotnet watch run` to start the app in dev mode.
 
 ## How to Use the REST-API
 ### Sending a GET request to /api of the application returns an explanation of how to use the API.
