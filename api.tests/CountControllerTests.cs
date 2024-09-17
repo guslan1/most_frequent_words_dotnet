@@ -370,5 +370,22 @@ namespace api.tests
             Assert.Equal("Input text does not contain any valid words.", result.Value);
         }
 
+        [Fact]
+        public async Task WordCount_HandlesEdgeCaseWithFewValidWords()
+        {
+            // Arrange
+            var text = "!@#$%^&*()hund";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(1, wordCount["hund"]);
+        }
+
     }
 }
