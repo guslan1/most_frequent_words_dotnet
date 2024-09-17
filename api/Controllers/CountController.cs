@@ -72,8 +72,7 @@ namespace api.Controllers
 
             return wordCount;
         }
-
-
+        
         private Dictionary<string, int> GetTopTenWords(Dictionary<string, int> wordCount)
         {
             return wordCount
