@@ -272,6 +272,39 @@ namespace api.tests
         }
 
 
+        [Fact]
+        public async Task WordCount_SortsAlphabetically_WhenAllWordsHaveSameFrequency()
+        {
+            // Arrange
+            var text = "äpple banan citron durian";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.Equal(new[] { "banan", "citron", "durian", "äpple" }, wordCount.Keys.ToArray());
+        }
+
+
+        [Fact]
+        public async Task WordCount_HandlesVeryLargeInput()
+        {
+            // Arrange
+            var veryLargeText = new string('a', 100001); 
+            var controller = CreateControllerWithMockedContext(veryLargeText);
+
+            // Act
+            var result = await controller.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal($"Input text cannot exceed 10000 characters.", result.Value);
+        }
+
+
 
 
 
