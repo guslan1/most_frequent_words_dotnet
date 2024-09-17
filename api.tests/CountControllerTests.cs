@@ -340,6 +340,23 @@ namespace api.tests
             Assert.Equal(1, wordCount["word5"]);
         }
 
+        [Fact]
+        public async Task WordCount_HandlesRepeatedWordsWithPunctuation()
+        {
+            // Arrange
+            var text = "cat, cat! cat?";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(3, wordCount["cat"]);
+        }
+
 
 
     }
