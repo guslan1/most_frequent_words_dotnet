@@ -32,11 +32,6 @@ Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
 ### Sending a GET request to /api of the application returns an explanation of how to use the API.
 ```json
 {
-    "self": {
-        "href": "http://localhost:5116/api",
-        "method": "GET",
-        "desc": "Overview of most frequent words API"
-    },
     "count": {
         "href": "http://localhost:5116/count",
         "method": "POST",
