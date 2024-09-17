@@ -293,7 +293,7 @@ namespace api.tests
         public async Task WordCount_HandlesVeryLargeInput()
         {
             // Arrange
-            var veryLargeText = new string('a', 100001); 
+            var veryLargeText = new string('a', 100001);
             var controller = CreateControllerWithMockedContext(veryLargeText);
 
             // Act
@@ -302,6 +302,21 @@ namespace api.tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal($"Input text cannot exceed 10000 characters.", result.Value);
+        }
+
+        [Fact]
+        public async Task WordCount_IgnoresInputWithOnlyNumbers()
+        {
+            // Arrange
+            var controller = CreateControllerWithMockedContext("12345 67890");
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.Empty(wordCount);  // Should return an empty dictionary
         }
 
 
