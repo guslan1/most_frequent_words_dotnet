@@ -56,7 +56,7 @@ namespace api.Controllers
 
             foreach (var word in words)
             {
-                // Kontrollera att ordet inte är tomt, inte bara består av vita tecken, innehåller minst en bokstav, och är max 100 tecken långt
+                // Ensure the word is not empty, does not consist only of whitespace, contains at least one letter, and is at most 100 characters long.
                 if (!string.IsNullOrWhiteSpace(word) && word.Length <= MaxWordLength && Regex.IsMatch(word, @"[a-zA-Z]"))
                 {
                     if (wordCount.ContainsKey(word))

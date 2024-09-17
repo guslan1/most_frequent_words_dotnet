@@ -37,8 +37,12 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
+
+            // Verify the word counts
             Assert.Equal(3, wordCount["hund"]);
             Assert.Equal(2, wordCount["banan"]);
             Assert.Equal(2, wordCount["katt"]);
@@ -56,6 +60,8 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Equal(3, wordCount["hund"]);
@@ -73,8 +79,11 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
+
             Assert.True(wordCount.Count <= 10, "The result should contain at most 10 words.");
         }
 
@@ -90,35 +99,51 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
+
+            // Verify word counts
             Assert.Equal(2, wordCount.Count);
             Assert.Equal(4, wordCount["banan"]);
             Assert.Equal(4, wordCount["björn"]);
 
-            // Kontrollera att orden är sorterade alfabetiskt när frekvenserna är lika
+            // Verify that words are sorted alphabetically when frequencies are equal
             var sortedKeys = new List<string>(wordCount.Keys);
+            sortedKeys.Sort();
             Assert.Equal("banan", sortedKeys[0]);
             Assert.Equal("björn", sortedKeys[1]);
         }
 
         [Fact]
-        public async Task WordCount_ReturnsBadRequest_ForEmptyOrWhitespaceInput()
+        public async Task WordCount_ReturnsBadRequest_ForEmptyInput()
         {
             // Arrange
-            var controllerEmpty = CreateControllerWithMockedContext("");
-            var controllerWhitespace = CreateControllerWithMockedContext("   ");
+            var controller = CreateControllerWithMockedContext("");
 
             // Act
-            var resultEmpty = await controllerEmpty.WordCount() as BadRequestObjectResult;
-            var resultWhitespace = await controllerWhitespace.WordCount() as BadRequestObjectResult;
+            var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
-            Assert.NotNull(resultEmpty);
-            Assert.Equal("Input text cannot be empty or consist only of whitespace.", resultEmpty.Value);
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("Input text cannot be empty or consist only of whitespace.", result.Value);
+        }
 
-            Assert.NotNull(resultWhitespace);
-            Assert.Equal("Input text cannot be empty or consist only of whitespace.", resultWhitespace.Value);
+        [Fact]
+        public async Task WordCount_ReturnsBadRequest_ForWhitespaceInput()
+        {
+            // Arrange
+            var controller = CreateControllerWithMockedContext("   ");
+
+            // Act
+            var result = await controller.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("Input text cannot be empty or consist only of whitespace.", result.Value);
         }
 
         [Fact]
@@ -133,8 +158,12 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
+
+            // Verify word counts
             Assert.Equal(3, wordCount["hund"]);
             Assert.Equal(2, wordCount["banan"]);
             Assert.Equal(2, wordCount["katt"]);
@@ -145,36 +174,41 @@ namespace api.tests
         public async Task WordCount_ReturnsBadRequest_WhenInputExceedsMaxLength()
         {
             // Arrange
-            var longText = new string('a', 10001); // Text that exceeds the max length
-            var controller = CreateControllerWithMockedContext(longText);
+            const int maxLength = 10000;
+            var textExceedingMaxLength = new string('a', maxLength + 1);
+            var controller = CreateControllerWithMockedContext(textExceedingMaxLength);
 
             // Act
             var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Input text cannot exceed 10000 characters.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal($"Input text cannot exceed {maxLength} characters.", result.Value);
         }
 
         [Fact]
         public async Task WordCount_ReturnsBadRequest_ForInvalidContentType()
         {
             // Arrange
-            var controller = CreateControllerWithMockedContext("Banan Äpple Katt Hund Banan Hund Katt Hund", "application/json");
+            const string invalidContentType = "application/json";
+            const string expectedErrorMessage = "Invalid content type. Only 'text/plain' is supported.";
+            var controller = CreateControllerWithMockedContext("Banan Äpple Katt Hund Banan Hund Katt Hund", invalidContentType);
 
             // Act
             var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Invalid content type. Only 'text/plain' is supported.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal(expectedErrorMessage, result.Value);
         }
 
         [Fact]
         public async Task WordCount_HandlesMultilineInput()
         {
             // Arrange
-            var text = "banan äpple\nkatt hund\nbanan hund\nkatt hund";
+            const string text = "banan äpple\nkatt hund\nbanan hund\nkatt hund";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -182,8 +216,12 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
+
+            // Verify word counts
             Assert.Equal(3, wordCount["hund"]);
             Assert.Equal(2, wordCount["banan"]);
             Assert.Equal(2, wordCount["katt"]);
@@ -260,22 +298,24 @@ namespace api.tests
         public async Task WordCount_ReturnsBadRequest_ForOnlySpecialCharacters()
         {
             // Arrange
-            var controller = CreateControllerWithMockedContext("@#$%^&12345");
+            const string input = "@#$%^&12345";
+            const string expectedErrorMessage = "Input text does not contain any valid words.";
+            var controller = CreateControllerWithMockedContext(input);
 
             // Act
             var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Input text does not contain any valid words.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal(expectedErrorMessage, result.Value);
         }
-
 
         [Fact]
         public async Task WordCount_SortsAlphabetically_WhenAllWordsHaveSameFrequency()
         {
             // Arrange
-            var text = "äpple banan citron durian";
+            const string text = "äpple banan citron päron";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -283,8 +323,11 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode); // Verify that the status code is 200 OK
+
             var wordCount = result.Value as Dictionary<string, int>;
-            Assert.Equal(new[] { "banan", "citron", "durian", "äpple" }, wordCount.Keys.ToArray());
+            Assert.NotNull(wordCount);
+            Assert.Equal(new[] { "banan", "citron", "päron", "äpple" }, wordCount.Keys.ToArray());
         }
 
 
@@ -292,7 +335,8 @@ namespace api.tests
         public async Task WordCount_HandlesVeryLargeInput()
         {
             // Arrange
-            var veryLargeText = new string('a', 100001);
+            const int maxLength = 10000;
+            var veryLargeText = new string('a', maxLength + 1);
             var controller = CreateControllerWithMockedContext(veryLargeText);
 
             // Act
@@ -300,28 +344,32 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal($"Input text cannot exceed 10000 characters.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal($"Input text cannot exceed {maxLength} characters.", result.Value);
         }
 
         [Fact]
         public async Task WordCount_ReturnsBadRequest_ForInputWithOnlyNumbers()
         {
             // Arrange
-            var controller = CreateControllerWithMockedContext("12345 67890");
+            const string input = "12345 67890";
+            const string expectedErrorMessage = "Input text does not contain any valid words.";
+            var controller = CreateControllerWithMockedContext(input);
 
             // Act
             var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Input text does not contain any valid words.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal(expectedErrorMessage, result.Value);
         }
 
         [Fact]
         public async Task WordCount_HandlesVariousWhitespaceCharacters()
         {
             // Arrange
-            var text = "word1 \t word2  word3\nword4\rword5";
+            const string text = "word1 \t word2  word3\nword4\rword5";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -329,6 +377,8 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Equal(1, wordCount["word1"]);
@@ -342,7 +392,7 @@ namespace api.tests
         public async Task WordCount_HandlesRepeatedWordsWithPunctuation()
         {
             // Arrange
-            var text = "cat, cat! cat?";
+            const string text = "cat, cat! cat?";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -350,6 +400,8 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Equal(3, wordCount["cat"]);
@@ -359,7 +411,8 @@ namespace api.tests
         public async Task WordCount_IgnoresEmptyWordsAfterFiltering()
         {
             // Arrange
-            var text = "... , ! ? ";
+            const string text = "... , ! ? ";
+            const string expectedErrorMessage = "Input text does not contain any valid words.";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -367,14 +420,15 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Input text does not contain any valid words.", result.Value);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal(expectedErrorMessage, result.Value);
         }
 
         [Fact]
         public async Task WordCount_HandlesEdgeCaseWithFewValidWords()
         {
             // Arrange
-            var text = "!@#$%^&*()hund";
+            const string text = "!@#$%^&*()hund";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -382,6 +436,8 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Equal(1, wordCount["hund"]);
@@ -399,6 +455,7 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode); 
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Single(wordCount); // Ensure only one word is counted
@@ -409,8 +466,10 @@ namespace api.tests
         public async Task WordCount_IgnoresWordsLongerThanMaxWordLength()
         {
             // Arrange
-            var longWord = new string('a', 101); // Ett ord som är 101 tecken långt
-            var text = $"validword {longWord}";
+            const int maxWordLength = 100;
+            var longWord = new string('a', maxWordLength + 1); // A word that is 101 characters long
+            const string validWord = "validword";
+            var text = $"{validWord} {longWord}";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -418,10 +477,11 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
-            Assert.Equal(1, wordCount["validword"]); // Endast "validword" ska räknas
-            Assert.False(wordCount.ContainsKey(longWord)); // Det långa ordet ska inte finnas med
+            Assert.Equal(1, wordCount[validWord]); // Verify that the word "validword" appears exactly once in the word count dictionary
+            Assert.False(wordCount.ContainsKey(longWord));
         }
 
     }
