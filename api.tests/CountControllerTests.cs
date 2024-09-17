@@ -256,6 +256,22 @@ namespace api.tests
             Assert.Equal(1, asciiWordCount["apple"]);
         }
 
+        [Fact]
+        public async Task WordCount_IgnoresOnlySpecialCharacters()
+        {
+            // Arrange
+            var controller = CreateControllerWithMockedContext("@#$%^&12345");
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.Empty(wordCount);  // Should return an empty dictionary
+        }
+
+
 
 
 
