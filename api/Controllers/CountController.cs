@@ -8,6 +8,7 @@ namespace api.Controllers
     public class CountController : ControllerBase
     {
         private const int MaxTextLength = 10000;
+        private const int MaxWordLength = 100;
 
         [HttpPost("count")]
         [Consumes("text/plain")]
@@ -55,8 +56,8 @@ namespace api.Controllers
 
             foreach (var word in words)
             {
-                // Kontrollera att ordet inte är tomt, inte bara består av vita tecken och innehåller minst en bokstav
-                if (!string.IsNullOrWhiteSpace(word) && Regex.IsMatch(word, @"[a-zA-Z]"))
+                // Kontrollera att ordet inte är tomt, inte bara består av vita tecken, innehåller minst en bokstav, och är max 100 tecken långt
+                if (!string.IsNullOrWhiteSpace(word) && word.Length <= MaxWordLength && Regex.IsMatch(word, @"[a-zA-Z]"))
                 {
                     if (wordCount.ContainsKey(word))
                     {

@@ -387,5 +387,42 @@ namespace api.tests
             Assert.Equal(1, wordCount["hund"]);
         }
 
+        [Fact]
+        public async Task WordCount_HandlesInputAtMaxWordLengthLimit()
+        {
+            // Arrange
+            var text = new string('a', 99); // Text that is exactly 99 characters long
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Single(wordCount); // Ensure only one word is counted
+            Assert.Equal(1, wordCount[text]); // The word should be the entire string of 'a's
+        }
+
+        [Fact]
+        public async Task WordCount_IgnoresWordsLongerThanMaxWordLength()
+        {
+            // Arrange
+            var longWord = new string('a', 101); // Ett ord som är 101 tecken långt
+            var text = $"validword {longWord}";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(1, wordCount["validword"]); // Endast "validword" ska räknas
+            Assert.False(wordCount.ContainsKey(longWord)); // Det långa ordet ska inte finnas med
+        }
+
     }
 }
