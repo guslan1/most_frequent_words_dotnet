@@ -8,12 +8,13 @@ namespace api.tests
 {
     public class CountControllerTests
     {
-        private CountController CreateControllerWithMockedContext(string requestBody)
+        private CountController CreateControllerWithMockedContext(string requestBody, string contentType = "text/plain")
         {
             var mockHttpContext = new Mock<HttpContext>();
             var mockRequest = new Mock<HttpRequest>();
             var mockBody = new MemoryStream(Encoding.UTF8.GetBytes(requestBody));
             mockRequest.Setup(r => r.Body).Returns(mockBody);
+            mockRequest.Setup(r => r.ContentType).Returns(contentType);
             mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
 
             return new CountController
@@ -153,6 +154,20 @@ namespace api.tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Input text cannot exceed 10000 characters.", result.Value);
+        }
+
+        [Fact]
+        public async Task WordCount_ReturnsBadRequest_ForInvalidContentType()
+        {
+            // Arrange
+            var controller = CreateControllerWithMockedContext("Banan Äpple Katt Hund Banan Hund Katt Hund", "application/json");
+
+            // Act
+            var result = await controller.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Invalid content type. Only 'text/plain' is supported.", result.Value);
         }
 
 
