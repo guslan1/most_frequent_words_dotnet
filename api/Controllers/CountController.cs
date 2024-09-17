@@ -18,7 +18,7 @@ namespace api.Controllers
             {
                 return BadRequest("Invalid content type. Only 'text/plain' is supported.");
             }
-            
+
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
             var text = await reader.ReadToEndAsync();
 
@@ -46,19 +46,26 @@ namespace api.Controllers
         private Dictionary<string, int> CountWords(string[] words)
         {
             var wordCount = new Dictionary<string, int>();
+
             foreach (var word in words)
             {
-                if (wordCount.ContainsKey(word))
+                // Kontrollera att ordet inte är tomt, inte bara består av vita tecken och innehåller minst en bokstav
+                if (!string.IsNullOrWhiteSpace(word) && Regex.IsMatch(word, @"[a-zA-Z]"))
                 {
-                    wordCount[word]++;
-                }
-                else
-                {
-                    wordCount[word] = 1;
+                    if (wordCount.ContainsKey(word))
+                    {
+                        wordCount[word]++;
+                    }
+                    else
+                    {
+                        wordCount[word] = 1;
+                    }
                 }
             }
+
             return wordCount;
         }
+
 
         private Dictionary<string, int> GetTopTenWords(Dictionary<string, int> wordCount)
         {
