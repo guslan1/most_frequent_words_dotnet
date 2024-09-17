@@ -190,6 +190,72 @@ namespace api.tests
             Assert.Equal(1, wordCount["äpple"]);
         }
 
+        [Fact]
+        public async Task WordCount_HandlesDifferentEncodings()
+        {
+            // Arrange
+            var textUtf8 = "banan äpple katt hund banan hund katt hund";
+            var textAscii = "banana apple cat dog banana dog cat dog";
+
+            // Test with UTF-8 encoding
+            var utf8Encoding = Encoding.UTF8;
+            var utf8MockHttpContext = new Mock<HttpContext>();
+            var utf8MockRequest = new Mock<HttpRequest>();
+            var utf8MockBody = new MemoryStream(utf8Encoding.GetBytes(textUtf8));
+            utf8MockRequest.Setup(r => r.Body).Returns(utf8MockBody);
+            utf8MockRequest.Setup(r => r.ContentType).Returns("text/plain");
+            utf8MockHttpContext.Setup(c => c.Request).Returns(utf8MockRequest.Object);
+
+            var utf8Controller = new CountController
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = utf8MockHttpContext.Object
+                }
+            };
+
+            // Act
+            var utf8Result = await utf8Controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(utf8Result);
+            var utf8WordCount = utf8Result.Value as Dictionary<string, int>;
+            Assert.NotNull(utf8WordCount);
+            Assert.Equal(3, utf8WordCount["hund"]);
+            Assert.Equal(2, utf8WordCount["banan"]);
+            Assert.Equal(2, utf8WordCount["katt"]);
+            Assert.Equal(1, utf8WordCount["äpple"]);
+
+            // Test with ASCII encoding
+            var asciiEncoding = Encoding.ASCII;
+            var asciiMockHttpContext = new Mock<HttpContext>();
+            var asciiMockRequest = new Mock<HttpRequest>();
+            var asciiMockBody = new MemoryStream(asciiEncoding.GetBytes(textAscii));
+            asciiMockRequest.Setup(r => r.Body).Returns(asciiMockBody);
+            asciiMockRequest.Setup(r => r.ContentType).Returns("text/plain");
+            asciiMockHttpContext.Setup(c => c.Request).Returns(asciiMockRequest.Object);
+
+            var asciiController = new CountController
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = asciiMockHttpContext.Object
+                }
+            };
+
+            // Act
+            var asciiResult = await asciiController.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(asciiResult);
+            var asciiWordCount = asciiResult.Value as Dictionary<string, int>;
+            Assert.NotNull(asciiWordCount);
+            Assert.Equal(3, asciiWordCount["dog"]);
+            Assert.Equal(2, asciiWordCount["banana"]);
+            Assert.Equal(2, asciiWordCount["cat"]);
+            Assert.Equal(1, asciiWordCount["apple"]);
+        }
+
 
 
 
