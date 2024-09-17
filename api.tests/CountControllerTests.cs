@@ -170,6 +170,26 @@ namespace api.tests
             Assert.Equal("Invalid content type. Only 'text/plain' is supported.", result.Value);
         }
 
+        [Fact]
+        public async Task WordCount_HandlesMultilineInput()
+        {
+            // Arrange
+            var text = "banan äpple\nkatt hund\nbanan hund\nkatt hund";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(3, wordCount["hund"]);
+            Assert.Equal(2, wordCount["banan"]);
+            Assert.Equal(2, wordCount["katt"]);
+            Assert.Equal(1, wordCount["äpple"]);
+        }
+
 
 
 
