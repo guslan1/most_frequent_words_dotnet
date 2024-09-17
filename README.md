@@ -46,7 +46,5 @@ Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
     }
 ```
 
-```json
 $ curl -H "Content-type: text/plain" -X "POST" -d "Banan Äpple Katt Hund Banan Hund Katt Hund" http://localhost:5116/count
 $ {"Hund":3,"Banan":2,"Katt":2,"Äpple":1}
-```
