@@ -319,7 +319,26 @@ namespace api.tests
             Assert.Empty(wordCount);  // Should return an empty dictionary
         }
 
+        [Fact]
+        public async Task WordCount_HandlesVariousWhitespaceCharacters()
+        {
+            // Arrange
+            var text = "word1 \t word2  word3\nword4\rword5";
+            var controller = CreateControllerWithMockedContext(text);
 
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(1, wordCount["word1"]);
+            Assert.Equal(1, wordCount["word2"]);
+            Assert.Equal(1, wordCount["word3"]);
+            Assert.Equal(1, wordCount["word4"]);
+            Assert.Equal(1, wordCount["word5"]);
+        }
 
 
 
