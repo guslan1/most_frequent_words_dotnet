@@ -455,7 +455,7 @@ namespace api.tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(200, result.StatusCode); 
+            Assert.Equal(200, result.StatusCode);
             var wordCount = result.Value as Dictionary<string, int>;
             Assert.NotNull(wordCount);
             Assert.Single(wordCount); // Ensure only one word is counted
@@ -482,6 +482,52 @@ namespace api.tests
             Assert.NotNull(wordCount);
             Assert.Equal(1, wordCount[validWord]); // Verify that the word "validword" appears exactly once in the word count dictionary
             Assert.False(wordCount.ContainsKey(longWord));
+        }
+
+        [Fact]
+        public async Task WordCount_HandlesSingleLetterWords()
+        {
+            // Arrange
+            const string text = "a b c d e";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(1, wordCount["a"]);
+            Assert.Equal(1, wordCount["b"]);
+            Assert.Equal(1, wordCount["c"]);
+            Assert.Equal(1, wordCount["d"]);
+            Assert.Equal(1, wordCount["e"]);
+        }
+
+        [Fact]
+        public async Task WordCount_HandlesTwoLetterWords()
+        {
+            // Arrange
+            const string text = "an be do go it";
+            var controller = CreateControllerWithMockedContext(text);
+
+            // Act
+            var result = await controller.WordCount() as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode); // Kontrollera att statuskoden är 200 OK
+
+            var wordCount = result.Value as Dictionary<string, int>;
+            Assert.NotNull(wordCount);
+            Assert.Equal(1, wordCount["an"]);
+            Assert.Equal(1, wordCount["be"]);
+            Assert.Equal(1, wordCount["do"]);
+            Assert.Equal(1, wordCount["go"]);
+            Assert.Equal(1, wordCount["it"]);
         }
 
     }
