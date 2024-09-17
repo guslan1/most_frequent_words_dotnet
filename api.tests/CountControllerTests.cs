@@ -257,18 +257,17 @@ namespace api.tests
         }
 
         [Fact]
-        public async Task WordCount_IgnoresOnlySpecialCharacters()
+        public async Task WordCount_ReturnsBadRequest_ForOnlySpecialCharacters()
         {
             // Arrange
             var controller = CreateControllerWithMockedContext("@#$%^&12345");
 
             // Act
-            var result = await controller.WordCount() as OkObjectResult;
+            var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            var wordCount = result.Value as Dictionary<string, int>;
-            Assert.Empty(wordCount);  // Should return an empty dictionary
+            Assert.Equal("Input text does not contain any valid words.", result.Value);
         }
 
 
@@ -305,18 +304,17 @@ namespace api.tests
         }
 
         [Fact]
-        public async Task WordCount_IgnoresInputWithOnlyNumbers()
+        public async Task WordCount_ReturnsBadRequest_ForInputWithOnlyNumbers()
         {
             // Arrange
             var controller = CreateControllerWithMockedContext("12345 67890");
 
             // Act
-            var result = await controller.WordCount() as OkObjectResult;
+            var result = await controller.WordCount() as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
-            var wordCount = result.Value as Dictionary<string, int>;
-            Assert.Empty(wordCount);  // Should return an empty dictionary
+            Assert.Equal("Input text does not contain any valid words.", result.Value);
         }
 
         [Fact]
@@ -357,7 +355,20 @@ namespace api.tests
             Assert.Equal(3, wordCount["cat"]);
         }
 
+        [Fact]
+        public async Task WordCount_IgnoresEmptyWordsAfterFiltering()
+        {
+            // Arrange
+            var text = "... , ! ? ";
+            var controller = CreateControllerWithMockedContext(text);
 
+            // Act
+            var result = await controller.WordCount() as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Input text does not contain any valid words.", result.Value);
+        }
 
     }
 }

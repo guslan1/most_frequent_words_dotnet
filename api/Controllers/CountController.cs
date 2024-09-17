@@ -38,6 +38,12 @@ namespace api.Controllers
 
             Dictionary<string, int> wordCount = CountWords(words);
 
+            if (wordCount.Count == 0)
+            {
+                return BadRequest("Input text does not contain any valid words.");
+            }
+
+
             Dictionary<string, int> topTenWords = GetTopTenWords(wordCount);
 
             return Ok(topTenWords);
