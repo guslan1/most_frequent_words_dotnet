@@ -17,21 +17,26 @@ The assignment is to create a web-API that returns the count of the 10 most freq
 ## Scripts
 
 ### Installing Dependencies
+
 Within the `api` folder, run `dotnet restore` to install dependencies.
 
 ### The Application
+
 Within the `api` folder, run `dotnet run` to start the app.
 
 ### Developer Mode
+
 Within the `api` folder, run `dotnet watch run` to start the app in dev mode.
 
 ### Running Tests
+
 Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
 
 ## How to Use the REST-API
-### Sending a GET request to /api of the application returns an explanation of how to use the API.
+
+### Sending a POST request to /count of the application returns the count of the ten most frequent words in the input string.
+
 ```json
-{
     "count": {
         "href": "http://localhost:5116/count",
         "method": "POST",
@@ -39,4 +44,4 @@ Within the `api.tests` folder, run `dotnet test` to execute the unit tests.
         "params": "{input_string}",
         "header": "Content-Type: text/plain"
     }
-}
+```
