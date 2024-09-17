@@ -122,10 +122,10 @@ namespace api.tests
         }
 
         [Fact]
-        public async Task WordCount_IgnoresPunctuationAndCountsWordsCorrectly()
+        public async Task WordCount_IgnoresPunctuationAndSpecialCharacters()
         {
             // Arrange
-            var text = "banan, äpple! katt? hund. banan; hund: katt hund";
+            var text = "banan, äpple! katt? hund. banan; hund: katt hund @#%^&*()_+={}[]|\\:\"'<>,.?/~`";
             var controller = CreateControllerWithMockedContext(text);
 
             // Act
@@ -169,6 +169,8 @@ namespace api.tests
             Assert.NotNull(result);
             Assert.Equal("Invalid content type. Only 'text/plain' is supported.", result.Value);
         }
+
+
 
 
     }
