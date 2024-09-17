@@ -7,12 +7,18 @@ namespace api.Controllers
 {
     public class CountController : ControllerBase
     {
-        private const int MaxTextLength = 10000; 
+        private const int MaxTextLength = 10000;
 
         [HttpPost("count")]
         [Consumes("text/plain")]
         public async Task<IActionResult> WordCount()
         {
+
+            if (Request.ContentType != "text/plain")
+            {
+                return BadRequest("Invalid content type. Only 'text/plain' is supported.");
+            }
+            
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
             var text = await reader.ReadToEndAsync();
 
